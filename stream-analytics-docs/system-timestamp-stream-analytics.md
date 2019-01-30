@@ -1,6 +1,6 @@
 ---
-title: "System.Timestamp  (Stream Analytics) | Microsoft Docs"
-description: "System.Timestamp is a system property that can be used to retrieve the event’s timestamp. "
+title: "System.Timestamp()  (Stream Analytics) | Microsoft Docs"
+description: "System.Timestamp() is a system function that can be used to retrieve the event’s timestamp."
 applies_to: 
   - "Azure"
 services: stream-analytics
@@ -15,8 +15,8 @@ ms.workload: data-services
 ms.date: 04/22/2016
 ms.author: mamccrea
 ---
-# System.Timestamp  (Stream Analytics)
-  Every event at every stage of the query in Azure Stream Analytics has a timestamp associated with it. System.Timestamp is a system property that can be used to retrieve the event’s timestamp.  
+# System.Timestamp()  (Stream Analytics)
+  Every event at every stage of the query in Azure Stream Analytics has a timestamp associated with it. System.Timestamp() is a system function that can be used to retrieve the event’s timestamp. Note that getting timestamp as a system property `System.Timestamp` is still supported, but using function is preferred, since use of property is depricated in compatibility mode 1.2.
   
  Below, we describe how Azure Stream Analytics assigns timestamps to events.  
   
@@ -24,9 +24,9 @@ ms.author: mamccrea
  Timestamp of the input event can be defined by column value (or an expression) specified in the [TIMESTAMP BY](timestamp-by-azure-stream-analytics.md) clause:  
   
 ```SQL  
-SELECT System.Timestamp t   
-FROM input   
-TIMESTAMP BY MyTimeField  
+SELECT System.Timestamp() t
+FROM input
+TIMESTAMP BY MyTimeField 
   
 ```  
   
@@ -44,9 +44,9 @@ SELECT
       Prop1,  
       Prop2,  
       Prop3 - Prop4 / 12,
-      System.Timestamp t  
+      System.Timestamp() t  
 FROM input  
-  
+
 ```  
   
  Projections do not alter the timestamp of the event, the timestamp of the result is the same as the timestamp of the input.  
@@ -69,10 +69,10 @@ SELECT
       userId,  
       AVG(prop1),  
       SUM(prop2),  
-      System.Timestamp t  
+      System.Timestamp() t
 FROM input  
 GROUP BY TumblingWindow(minute, 1), userId  
-  
+
 ```  
   
  The timestamp of the result of the aggregate is the end of the time window to which this result corresponds. Please see [Windowing &#40;Azure Stream Analytics&#41;](windowing-azure-stream-analytics.md) articles describing different window types in Azure Stream Analytics.  
@@ -81,12 +81,12 @@ GROUP BY TumblingWindow(minute, 1), userId
   
 ```SQL  
 SELECT  
-      System.Timestamp  
+      System.Timestamp()
 FROM input1  
 JOIN input2  
 ON DATEDIFF(minute, input1, input2) BETWEEN 0 AND 10  
   
-```  
+```
   
  An inner join produces results that correspond to matching pairs of events from input1 and input2.  
   
@@ -96,11 +96,11 @@ ON DATEDIFF(minute, input1, input2) BETWEEN 0 AND 10
   
 ```SQL  
 SELECT  
-      System.Timestamp  
-FROM input1  
-LEFT JOIN input2  
-ON DATEDIFF(minute, input1, input2) BETWEEN -2 AND 10  
-  
+      System.Timestamp()
+FROM input1
+    LEFT JOIN input2
+      ON DATEDIFF(minute, input1, input2) BETWEEN -2 AND 10  
+
 ```  
   
  A left-outer join produces results of two types.  Some correspond to a matching pair of events from input1 and input2; others correspond to just an event from input1, and indicate that no matching event from input2 was found.  
