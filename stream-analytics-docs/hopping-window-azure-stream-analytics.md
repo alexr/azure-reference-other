@@ -80,6 +80,31 @@ GROUP BY TollId, HoppingWindow(Duration(hour, 1), Hop(minute, 5), Offset(millise
 ```  
   
 ```SQL
-multiwindow example...
+SELECT System.Window().Duration, TollId, COUNT(*)
+FROM Input TIMESTAMP BY EntryTime
+GROUP BY TollId, HoppingRollupWindow(Duration(minute, 1), Duration(minute, 15), Duration(minute, 60), Hop(minute, 1))
 ```
 
+```SQL
+WITH HoppinWindowResults 
+( 
+    SELECT  
+        System.Window().Start, 
+        System.Window().Duration AS windowSize, 
+        TollId, 
+        COUNT(*)   
+    FROM Input TIMESTAMP BY EntryTime   
+    GROUP BY  
+        TollId,  
+        HoppingRollupWindow( 
+            MinDuration(minute, 10), 
+            MaxDuration(minute, 60), 
+            Hop(minute, 5)) 
+) 
+
+SELECT HoppingWindowResults.* 
+FROM HoppingWindowResults 
+JOIN ReferenceTable ON  
+    HoppingWindowResults.TollId = ReferenceTable.TollId 
+    AND HoppingWindowResults.windowSize = ReferenceTable.windowSize
+```
