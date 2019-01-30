@@ -23,14 +23,24 @@ ms.author: mamccrea
  ## Syntax  
   
 ```SQL   
-HOPPINGWINDOW ( timeunit  , windowsize , hopsize, [offsetsize] )   
-HOPPINGWINDOW ( Duration( timeunit  , windowsize ) , Hop (timeunit  , windowsize ), [Offset(timeunit  , offsetsize)])  
-  
+HOPPINGWINDOW ( timeunit , windowsize , hopsize, [offsetsize] )   
+HOPPINGWINDOW ( Duration(timeunit, windowsize), Hop(timeunit, hopsize), [Offset(timeunit, offsetsize)] )  
+
 ```  
   
 > [!NOTE]  
->  The Hopping Window can be used in the above two ways. If the windowsize and the hopsize has the same timeunit, you can use it without the Duration and Hop functions. The Duration function can also be used with other types of windows to specify the window size.  
-  
+>  The Hopping Window can be used in the above two ways. If the windowsize and the hopsize has the same timeunit, you can use it without the Duration and Hop functions. The Duration function can also be used with other types of windows to specify the window size.
+
+There is also a special syntax for specifying multiple durations for computing results over more than one possible window in the same query:
+
+```SQL
+HOPPINGWINDOW ( Duration(timeunit, windowsize), ... , Duration(timeunit, windowsize) , Hop(timeunit, hopsize), [Offset(timeunit, offsetsize)] )
+
+```
+, where all durations must be different and preceed specification of hop and optional offset.
+This is equivalent to specifying multiple hopping windows each with different duration and the unioning all window results.
+System function `System.Window().Duration` can be used to access duration of the window for which the result is computed to distinguish results of different windows.
+
 ## Arguments  
  **timeunit**  
   
@@ -69,4 +79,7 @@ GROUP BY TollId, HoppingWindow(Duration(hour, 1), Hop(minute, 5), Offset(millise
   
 ```  
   
-  
+```SQL
+multiwindow example...
+```
+
