@@ -82,7 +82,11 @@ GROUP BY TollId, HoppingWindow(Duration(hour, 1), Hop(minute, 5), Offset(millise
 ```SQL
 SELECT System.Window().Duration, TollId, COUNT(*)
 FROM Input TIMESTAMP BY EntryTime
-GROUP BY TollId, HoppingRollupWindow(Duration(minute, 1), Duration(minute, 15), Duration(minute, 60), Hop(minute, 1))
+GROUP BY TollId, HoppingRollupWindow(
+                     Duration(minute, 1),
+                     Duration(minute, 15),
+                     Duration(minute, 60),
+                     Hop(minute, 1))
 ```
 
 ```SQL
