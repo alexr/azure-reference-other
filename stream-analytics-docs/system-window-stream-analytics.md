@@ -16,19 +16,41 @@ ms.date: 01/30/2019
 ms.author: mamccrea
 ---
 # System.Window()  (Stream Analytics)
-  Every event at every stage of the query in Azure Stream Analytics has a timestamp associated with it. System.Timestamp() is a system function that can be used to retrieve the event’s timestamp. Note that getting timestamp as a system property `System.Timestamp` is still supported, but using function is preferred, since use of property is depricated in compatibility mode 1.2.
+  Every event in the result of an aggregate query in Azure Stream Analytics belongs to a window of events over which the aggregate was computed. System.Window() provides access to the properties of the window. System.Window() can only be used with HOPPINGWINDOW when multiple durations are specified. Currently only Duration is available.
+
+## Syntax  
   
- Below, we describe how Azure Stream Analytics assigns timestamps to events.  
+```SQL
+System.Window().Duration(timeunit)
+
+```
+
+## Arguments  
+ **timeunit**  
   
-### **Input events timestamp**  
- Timestamp of the input event can be defined by column value (or an expression) specified in the [TIMESTAMP BY](timestamp-by-azure-stream-analytics.md) clause:  
+ Is the unit of time for the *duration* result. The following table lists all valid *timeunit* arguments.
   
-```SQL  
-SELECT System.Timestamp() t
+|Timeunit|Abbreviations|  
+|--------------|-------------------|  
+|day|dd, d|  
+|hour|hh|  
+|minute|mi, n|  
+|second|ss, s|  
+|millisecond|ms|  
+|microsecond|mcs|  
+
+ **resturned value**
+ 
+ Is a float representing window's duration in the specified time units.
+ 
+## Example
+
+```SQL
+SELECT
+    System.Window().Duration(second) AS windowInSeconds,
+    System.Window().Duration(minute) AS WindowInMinutes,
+    COUNT(*) AS count
 FROM input
-TIMESTAMP BY MyTimeField 
-  
-```  
-  
- If a TIMESTAMP BY clause is not specified for a given input, arrival time of the event is used as a timestamp. For example Enqueued time of the event will be used in case of Event Hub input.  
-  
+GROUP BY id, HOPPINGWINDOW(Duration(minute, 5), Duration(second, 30), Hop(second, 10))
+```
+The value of `WindowInSeconds` will be one of 30.0 or 300.0 and the value of the `WindowInMinutes` will be correspondingly either 0.5 or 5.0 depending on which window the resulting event will belong.
