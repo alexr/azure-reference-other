@@ -80,9 +80,9 @@ GROUP BY TollId, HoppingWindow(Duration(hour, 1), Hop(minute, 5), Offset(millise
 ```  
   
 ```SQL
-SELECT System.Window().Duration, TollId, COUNT(*)
+SELECT System.Window().Duration(minute), TollId, COUNT(*)
 FROM Input TIMESTAMP BY EntryTime
-GROUP BY TollId, HoppingRollupWindow(
+GROUP BY TollId, HoppingWindow(
                      Duration(minute, 1),
                      Duration(minute, 15),
                      Duration(minute, 60),
@@ -90,20 +90,19 @@ GROUP BY TollId, HoppingRollupWindow(
 ```
 
 ```SQL
-WITH HoppinWindowResults 
-( 
-    SELECT  
-        System.Window().Start, 
-        System.Window().Duration AS windowSize, 
-        TollId, 
-        COUNT(*)   
-    FROM Input TIMESTAMP BY EntryTime   
-    GROUP BY  
-        TollId,  
-        HoppingRollupWindow( 
-            MinDuration(minute, 10), 
-            MaxDuration(minute, 60), 
-            Hop(minute, 5)) 
+WITH HoppinWindowResults
+(
+    SELECT
+        System.Window().Duration(minute) AS windowSize,
+        TollId,
+        COUNT(*)
+    FROM Input TIMESTAMP BY EntryTime
+    GROUP BY
+        TollId,
+        HoppingWindow(
+            MinDuration(minute, 10),
+            MaxDuration(minute, 60),
+            Hop(minute, 5))
 ) 
 
 SELECT HoppingWindowResults.* 
